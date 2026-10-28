@@ -1,0 +1,14 @@
+{
+  "name": "@uap/database",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@uap/core": "workspace:*",
+    "@uap/shared-types": "workspace:*",
+    "mongoose": "^9.11.4"
+  }
+}

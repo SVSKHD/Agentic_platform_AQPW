@@ -1,0 +1,63 @@
+# Local development stack. Not a production deployment.
+#   docker compose up -d mongo redis      # infra only, run apps with pnpm dev:api / dev:worker
+#   docker compose up --build             # everything in containers
+services:
+  mongo:
+    image: mongo:8
+    ports: ["27017:27017"]
+    volumes: [mongo-data:/data/db]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      retries: 5
+
+  redis:
+    image: redis:8-alpine
+    # BullMQ requires noeviction so queued jobs are never silently dropped.
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    ports: ["6379:6379"]
+    volumes: [redis-data:/data]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      retries: 5
+
+  api:
+    build: { context: ., dockerfile: infrastructure/docker/Dockerfile, target: api }
+    env_file: .env
+    environment:
+      MONGODB_URI: mongodb://mongo:27017/unified_ai_platform
+      REDIS_URL: redis://redis:6379
+    ports: ["4000:4000"]
+    depends_on:
+      mongo: { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+  worker:
+    build: { context: ., dockerfile: infrastructure/docker/Dockerfile, target: worker }
+    env_file: .env
+    environment:
+      MONGODB_URI: mongodb://mongo:27017/unified_ai_platform
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      mongo: { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+  # Reel render provider (Phase 5). Opt-in: docker compose --profile video up
+  # Needs infrastructure/moneyprinter/config.toml (copy MPT's config.example.toml; set [app] api_key,
+  # pexels/pixabay keys, and leave cross-posting/auto-upload OFF). No host port: internal only.
+  moneyprinter:
+    profiles: ["video"]
+    # Pin a tested digest before production; ":latest" is for local evaluation only.
+    # Not yet run here (no Docker on the dev machine): verify the container paths, and that this image
+    # starts the API on 8080 (not only the WebUI on 8501), against MPT's docker-compose.release.yml.
+    image: ghcr.io/harry0703/moneyprinterturbo:latest
+    volumes:
+      - ./infrastructure/moneyprinter/config.toml:/MoneyPrinterTurbo/config.toml:ro
+      - moneyprinter-storage:/MoneyPrinterTurbo/storage
+    expose: ["8080"]
+
+volumes:
+  moneyprinter-storage:
+  mongo-data:
+  redis-data:

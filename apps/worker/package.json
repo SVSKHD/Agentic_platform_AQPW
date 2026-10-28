@@ -1,0 +1,21 @@
+{
+  "name": "@uap/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --env-file-if-exists=../../.env src/index.ts",
+    "build": "tsup",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@uap/config": "workspace:*",
+    "@uap/core": "workspace:*",
+    "@uap/database": "workspace:*",
+    "bullmq": "^6.4.2",
+    "ioredis": "^6.0.0",
+    "mongoose": "^9.11.4",
+    "pino": "^10.4.0",
+    "zod": "^4.6.7"
+  }
+}

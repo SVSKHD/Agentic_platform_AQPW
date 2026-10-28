@@ -1,0 +1,15 @@
+{
+  "name": "@uap/auth",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@uap/core": "workspace:*",
+    "@uap/shared-types": "workspace:*",
+    "firebase-admin": "^14.5.0",
+    "jose": "^6.2.13"
+  }
+}

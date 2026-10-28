@@ -1,0 +1,29 @@
+{
+  "name": "unified-ai-platform",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.31.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev:api": "pnpm --filter @uap/api dev",
+    "dev:worker": "pnpm --filter @uap/worker dev",
+    "build": "pnpm -r --filter \"./apps/*\" build",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "api-client:create": "pnpm --filter @uap/api exec tsx --env-file-if-exists=../../.env src/scripts/create-api-client.ts",
+    "seed": "pnpm --filter @uap/api exec tsx --env-file-if-exists=../../.env src/scripts/seed.ts",
+    "inspect:aquakart": "pnpm --filter @uap/api exec tsx --env-file-if-exists=../../.env src/scripts/inspect-aquakart-db.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "mongodb-memory-server": "^11.3.0",
+    "tsup": "^9.0.0",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
+  }
+}
